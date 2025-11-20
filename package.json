@@ -1,0 +1,29 @@
+{
+    "name": "surusskor",
+    "version": "1.0.0",
+    "description": "Motosiklet hava durumu ve rota planlama uygulaması",
+    "main": "index.html",
+    "scripts": {
+        "start": "npx http-server . -p 8080",
+        "cap:ios": "npx cap open ios",
+        "cap:sync": "npx cap sync ios",
+        "build:ios": "npx cap copy ios && npx cap sync ios"
+    },
+    "keywords": [
+        "motosiklet",
+        "hava durumu",
+        "rota",
+        "ios",
+        "capacitor"
+    ],
+    "author": "SürüşSkor",
+    "license": "MIT",
+    "devDependencies": {
+        "@capacitor/cli": "^5.5.1"
+    },
+    "dependencies": {
+        "@capacitor/android": "^5.7.8",
+        "@capacitor/core": "^5.5.1",
+        "@capacitor/ios": "^5.5.1"
+    }
+}

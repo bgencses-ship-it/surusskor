@@ -1,0 +1,42 @@
+{
+  "name": "SürüşSkor - Motosiklet Hava Durumu",
+  "short_name": "SürüşSkor",
+  "description": "Motosiklet sürücüleri için akıllı hava durumu analizi ve rota planlama uygulaması",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#137fec",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": [
+    "travel",
+    "weather",
+    "utilities"
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png"
+    }
+  ]
+}
