@@ -603,3 +603,28 @@ calculateFuel();
         }
     }
 })();
+
+// Dynamic Greeting Logic
+function updateGreeting() {
+    const greetingElement = document.getElementById('greeting-text');
+    if (!greetingElement) return;
+
+    const hour = new Date().getHours();
+    let greeting = 'Günaydın';
+
+    if (hour >= 6 && hour < 12) {
+        greeting = 'Günaydın';
+    } else if (hour >= 12 && hour < 17) {
+        greeting = 'İyi Günler';
+    } else if (hour >= 17 && hour < 22) {
+        greeting = 'İyi Akşamlar';
+    } else {
+        greeting = 'İyi Geceler';
+    }
+
+    greetingElement.textContent = greeting;
+}
+
+// Update greeting on load and every minute
+updateGreeting();
+setInterval(updateGreeting, 60000);
