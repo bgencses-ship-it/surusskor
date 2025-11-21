@@ -584,10 +584,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Showing install prompt...'); // Debug log
             // Show prompt after 2 seconds
             setTimeout(() => {
+                // Force remove hidden and set display block
                 prompt.classList.remove('hidden');
+                prompt.style.display = 'block'; // Fallback
+
                 // Small delay for animation
                 setTimeout(() => {
                     prompt.classList.remove('translate-y-full', 'opacity-0');
+                    prompt.style.transform = 'translateY(0)'; // Fallback
+                    prompt.style.opacity = '1'; // Fallback
                 }, 100);
             }, 2000);
 
