@@ -447,79 +447,84 @@
                 </div>
             </div>
         </div>
-    </div>
+        <!-- DEBUG BUTTON -->
+        <button id="debug-btn"
+            style="position: fixed; top: 100px; left: 20px; z-index: 9999; background: red; color: white; padding: 10px; border-radius: 5px;">
+            DEBUG: Test Prompt
+        </button>
 
-    <!-- iOS Install Prompt -->
-    <div id="ios-install-prompt"
-        class="hidden fixed bottom-20 left-4 right-4 bg-white dark:bg-zinc-800 rounded-2xl p-4 shadow-2xl border border-zinc-200 dark:border-zinc-700 z-50 transform transition-all duration-300 translate-y-full opacity-0">
-        <div class="flex items-start gap-4">
-            <button id="close-install-prompt"
-                class="absolute top-2 right-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
-                <span class="material-symbols-outlined text-xl">close</span>
-            </button>
-            <div class="bg-zinc-100 dark:bg-zinc-700 p-3 rounded-xl">
-                <span class="material-symbols-outlined text-primary text-3xl">ios_share</span>
+        <!-- iOS Install Prompt -->
+        <div id="ios-install-prompt"
+            class="hidden fixed bottom-20 left-4 right-4 bg-white dark:bg-zinc-800 rounded-2xl p-4 shadow-2xl border border-zinc-200 dark:border-zinc-700 z-50 transform transition-all duration-300 translate-y-full opacity-0">
+            <div class="flex items-start gap-4">
+                <button id="close-install-prompt"
+                    class="absolute top-2 right-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+                <div class="bg-zinc-100 dark:bg-zinc-700 p-3 rounded-xl">
+                    <span class="material-symbols-outlined text-primary text-3xl">ios_share</span>
+                </div>
+                <div class="flex-1 pr-6">
+                    <h3 class="text-zinc-900 dark:text-white font-bold text-base mb-1">Uygulamayı Yükle</h3>
+                    <p class="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
+                        Daha iyi bir deneyim için:
+                        <br>
+                        1. <span class="inline-flex items-center justify-center align-middle mx-1"><span
+                                class="material-symbols-outlined text-primary text-sm">ios_share</span></span>
+                        <strong>Paylaş</strong> butonuna basın
+                        <br>
+                        2. <span class="inline-flex items-center justify-center align-middle mx-1"><span
+                                class="material-symbols-outlined text-zinc-600 dark:text-zinc-400 text-sm">add_box</span></span>
+                        <strong>Ana Ekrana Ekle</strong>'yi seçin
+                    </p>
+                </div>
             </div>
-            <div class="flex-1 pr-6">
-                <h3 class="text-zinc-900 dark:text-white font-bold text-base mb-1">Uygulamayı Yükle</h3>
-                <p class="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
-                    Daha iyi bir deneyim için:
-                    <br>
-                    1. <span class="inline-flex items-center justify-center align-middle mx-1"><span
-                            class="material-symbols-outlined text-primary text-sm">ios_share</span></span>
-                    <strong>Paylaş</strong> butonuna basın
-                    <br>
-                    2. <span class="inline-flex items-center justify-center align-middle mx-1"><span
-                            class="material-symbols-outlined text-zinc-600 dark:text-zinc-400 text-sm">add_box</span></span>
-                    <strong>Ana Ekrana Ekle</strong>'yi seçin
-                </p>
+            <!-- Arrow pointing down -->
+            <div
+                class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-zinc-800 border-b border-r border-zinc-200 dark:border-zinc-700 transform rotate-45">
             </div>
         </div>
-        <!-- Arrow pointing down -->
-        <div
-            class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-zinc-800 border-b border-r border-zinc-200 dark:border-zinc-700 transform rotate-45">
-        </div>
-    </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark/95 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-800 z-50"
-        style="padding-bottom: env(safe-area-inset-bottom);">
-        <div class="max-w-md mx-auto flex justify-around items-center py-3">
-            <button data-tab="home" class="nav-btn flex flex-col items-center text-primary gap-1">
-                <span class="material-symbols-outlined">home</span>
-                <span class="text-xs">Home</span>
-            </button>
-            <button data-tab="routes" class="nav-btn flex flex-col items-center text-zinc-400 dark:text-zinc-500 gap-1">
-                <span class="material-symbols-outlined">route</span>
-                <span class="text-xs">Routes</span>
-            </button>
-            <button data-tab="gps-speed"
-                class="nav-btn flex flex-col items-center text-zinc-400 dark:text-zinc-500 gap-1">
-                <span class="material-symbols-outlined">gps_fixed</span>
-                <span class="text-xs">GPS Speed</span>
-            </button>
-            <button data-tab="fuel-calc"
-                class="nav-btn flex flex-col items-center text-zinc-400 dark:text-zinc-500 gap-1">
-                <span class="material-symbols-outlined">local_gas_station</span>
-                <span class="text-xs">Fuel Calc</span>
-            </button>
-        </div>
-    </nav>
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark/95 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-800 z-50"
+            style="padding-bottom: env(safe-area-inset-bottom);">
+            <div class="max-w-md mx-auto flex justify-around items-center py-3">
+                <button data-tab="home" class="nav-btn flex flex-col items-center text-primary gap-1">
+                    <span class="material-symbols-outlined">home</span>
+                    <span class="text-xs">Home</span>
+                </button>
+                <button data-tab="routes"
+                    class="nav-btn flex flex-col items-center text-zinc-400 dark:text-zinc-500 gap-1">
+                    <span class="material-symbols-outlined">route</span>
+                    <span class="text-xs">Routes</span>
+                </button>
+                <button data-tab="gps-speed"
+                    class="nav-btn flex flex-col items-center text-zinc-400 dark:text-zinc-500 gap-1">
+                    <span class="material-symbols-outlined">gps_fixed</span>
+                    <span class="text-xs">GPS Speed</span>
+                </button>
+                <button data-tab="fuel-calc"
+                    class="nav-btn flex flex-col items-center text-zinc-400 dark:text-zinc-500 gap-1">
+                    <span class="material-symbols-outlined">local_gas_station</span>
+                    <span class="text-xs">Fuel Calc</span>
+                </button>
+            </div>
+        </nav>
 
-    <script src="script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
-    </script>
+        <script src="script.js"></script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./service-worker.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                });
+            }
+        </script>
 </body>
 
 </html>

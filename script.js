@@ -571,6 +571,19 @@ calculateFuel();
 // PWA Install Prompt Logic
 // Run immediately since script is at end of body
 (function () {
+    // DEBUG BUTTON LOGIC
+    document.getElementById('debug-btn')?.addEventListener('click', () => {
+        const prompt = document.getElementById('ios-install-prompt');
+        alert('Debug Clicked!\nPrompt Element: ' + (prompt ? 'FOUND' : 'MISSING'));
+        if (prompt) {
+            prompt.classList.remove('hidden');
+            prompt.style.display = 'block';
+            prompt.classList.remove('translate-y-full', 'opacity-0');
+            prompt.style.transform = 'translateY(0)';
+            prompt.style.opacity = '1';
+        }
+    });
+
     // DEBUG: Alert to prove script is running
     // alert('Script loaded! Checking install prompt...'); 
 
