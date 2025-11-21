@@ -567,3 +567,35 @@ fuelDistanceInput?.addEventListener('input', calculateFuel);
 
 // Initial calculation
 calculateFuel();
+
+// PWA Install Prompt Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const promptShown = localStorage.getItem('iosInstallPromptShown');
+
+    if (isIOS && !isStandalone && !promptShown) {
+        const prompt = document.getElementById('ios-install-prompt');
+        const closeBtn = document.getElementById('close-install-prompt');
+
+        if (prompt && closeBtn) {
+            // Show prompt after 2 seconds
+            setTimeout(() => {
+                prompt.classList.remove('hidden');
+                // Small delay for animation
+                setTimeout(() => {
+                    prompt.classList.remove('translate-y-full', 'opacity-0');
+                }, 100);
+            }, 2000);
+
+            // Close handler
+            closeBtn.addEventListener('click', () => {
+                prompt.classList.add('translate-y-full', 'opacity-0');
+                setTimeout(() => {
+                    prompt.classList.add('hidden');
+                }, 300);
+                localStorage.setItem('iosInstallPromptShown', 'true');
+            });
+        }
+    }
+});
