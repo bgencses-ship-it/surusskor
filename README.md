@@ -1,6 +1,5 @@
 # 🏍️ SürüşSkor - Motosiklet Hava Durumu ve Rota Asistanı
 
-![SürüşSkor Banner](screenshot-mobile.png)
 
 > **Canlı Demo:** [https://bgencses-ship-it.github.io/surusskor/](https://bgencses-ship-it.github.io/surusskor/)
 
