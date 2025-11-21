@@ -117,8 +117,16 @@ cityInput?.addEventListener('keypress', (e) => {
 
 // Refresh button
 const refreshBtn = document.getElementById('refresh-btn');
-refreshBtn?.addEventListener('click', () => {
-    autoLoadWeather();
+refreshBtn?.addEventListener('click', async () => {
+    const icon = refreshBtn.querySelector('.material-symbols-outlined');
+    icon.classList.add('animate-spin');
+    try {
+        await autoLoadWeather();
+    } catch (err) {
+        // Error already handled in autoLoadWeather
+    } finally {
+        icon.classList.remove('animate-spin');
+    }
 });
 
 
@@ -178,40 +186,76 @@ function handleLocation() {
         },
         (err) => {
             showLoading(false);
-            showError("Konum alınamadı. Lütfen konum izni verin.");
+            let msg = "Konum alınamadı.";
+            switch (err.code) {
+                case err.PERMISSION_DENIED:
+                    msg = "Konum izni reddedildi. Lütfen tarayıcı ayarlarından izin verin.";
+                    break;
+                case err.POSITION_UNAVAILABLE:
+                    msg = "Konum bilgisi kullanılamıyor.";
+                    break;
+                case err.TIMEOUT:
+                    msg = "Konum isteği zaman aşımına uğradı.";
+                    break;
+                default:
+                    msg = "Konum hatası: " + err.message;
+            }
+            showError(msg);
+            console.error("Geolocation error:", err);
         }
     );
 }
 
 // Auto-load weather on page load
 function autoLoadWeather() {
-    if (!navigator.geolocation) {
-        showError("Tarayıcınız konum özelliğini desteklemiyor.");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
-            try {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-
-                const weather = await fetchWeather(lat, lon);
-                const analysis = analyzeWeather(weather);
-
-                updateHomeUI(analysis, weather);
-                weatherSection.classList.remove('hidden');
-                showLoading(false);
-            } catch (err) {
-                showError("Hava durumu yüklenemedi: " + err.message);
-                showLoading(false);
-            }
-        },
-        (err) => {
-            showLoading(false);
-            showError("Konum alınamadı. Lütfen konum izni verin.");
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            showError("Tarayıcınız konum özelliğini desteklemiyor.");
+            reject(new Error("Geolocation not supported"));
+            return;
         }
-    );
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                try {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    const weather = await fetchWeather(lat, lon);
+                    const analysis = analyzeWeather(weather);
+
+                    updateHomeUI(analysis, weather);
+                    weatherSection.classList.remove('hidden');
+                    showLoading(false);
+                    resolve();
+                } catch (err) {
+                    showError("Hava durumu yüklenemedi: " + err.message);
+                    showLoading(false);
+                    reject(err);
+                }
+            },
+            (err) => {
+                showLoading(false);
+                let msg = "Konum alınamadı.";
+                switch (err.code) {
+                    case err.PERMISSION_DENIED:
+                        msg = "Konum izni reddedildi. Lütfen tarayıcı ayarlarından izin verin.";
+                        break;
+                    case err.POSITION_UNAVAILABLE:
+                        msg = "Konum bilgisi kullanılamıyor.";
+                        break;
+                    case err.TIMEOUT:
+                        msg = "Konum isteği zaman aşımına uğradı.";
+                        break;
+                    default:
+                        msg = "Konum hatası: " + err.message;
+                }
+                showError(msg);
+                console.error("Geolocation error:", err);
+                reject(err);
+            }
+        );
+    });
 }
 
 async function fetchLocation(query) {
@@ -241,45 +285,59 @@ async function fetchWeather(lat, lon) {
 
 function analyzeWeather(data) {
     const current = data.current;
-    let score = 100;
-    let deductions = [];
-
-    const windSpeed = current.wind_speed_10m;
-    if (windSpeed > 50) {
-        score -= 100;
-        deductions.push("Tehlikeli Rüzgar");
-    } else if (windSpeed > 30) {
-        score -= 40;
-        deductions.push("Şiddetli Rüzgar");
-    } else if (windSpeed > 20) {
-        score -= 15;
-        deductions.push("Rüzgarlı");
-    }
-
     const temp = current.temperature_2m;
-    if (temp < 0) {
-        score -= 100;
-        deductions.push("Dondurucu Soğuk");
-    } else if (temp < 10) {
-        score -= 70;
-        deductions.push("Çok Soğuk");
-    } else if (temp < 18) {
-        score -= 40;
-        deductions.push("Serin");
-    } else if (temp > 35) {
-        score -= 50;
-        deductions.push("Aşırı Sıcak");
-    }
-
+    const windSpeed = current.wind_speed_10m;
     const precip = current.precipitation;
-    if (precip > 0) {
-        score -= 50;
-        deductions.push("Yağmur/Islak Zemin");
+
+    // 1. TEMPERATURE SCORE (Base Score)
+    // Ideal Range: 24°C - 38°C. 
+    // Below 24: 4 points penalty per degree.
+    // Above 38: 4 points penalty per degree.
+    const minIdeal = 24;
+    const maxIdeal = 38;
+    const tempPenaltyPerDegree = 4;
+
+    let tempScore = 100;
+    if (temp < minIdeal) {
+        tempScore -= (minIdeal - temp) * tempPenaltyPerDegree;
+    } else if (temp > maxIdeal) {
+        tempScore -= (temp - maxIdeal) * tempPenaltyPerDegree;
     }
+    tempScore = Math.max(0, Math.min(100, tempScore));
 
-    score = Math.max(0, Math.min(100, Math.round(score)));
+    // 2. WIND FACTOR (Multiplier)
+    // Safe up to 15 km/h. Then 2% penalty per km/h.
+    const windThreshold = 15;
+    let windFactor = 1.0;
+    if (windSpeed > windThreshold) {
+        windFactor = 1.0 - ((windSpeed - windThreshold) * 0.02);
+    }
+    windFactor = Math.max(0.0, windFactor);
 
-    return { score, deductions, temp, windSpeed, precip };
+    // 3. RAIN FACTOR (Multiplier)
+    // 20% penalty per mm.
+    let rainFactor = 1.0 - (precip * 0.20);
+    rainFactor = Math.max(0.0, rainFactor);
+
+    // FINAL SCORE
+    let finalScore = tempScore * windFactor * rainFactor;
+    finalScore = Math.round(finalScore);
+
+    // Generate Message
+    let message = "";
+    if (finalScore >= 90) message = "Mükemmel Sürüş Havası! 🏍️";
+    else if (finalScore >= 70) message = "Gayet İyi, Keyfini Çıkar.";
+    else if (finalScore >= 50) message = "İdare Eder, Ekipmanına Dikkat Et.";
+    else if (finalScore >= 30) message = "Zorlayıcı Şartlar.";
+    else message = "Sürüş İçin Uygun Değil ⛔";
+
+    // Generate Deductions for UI (Optional, but good for debugging/info)
+    let deductions = [];
+    if (tempScore < 100) deductions.push(`Sıcaklık Etkisi: -${100 - tempScore} puan`);
+    if (windFactor < 1.0) deductions.push(`Rüzgar Etkisi: %${Math.round((1 - windFactor) * 100)} azalma`);
+    if (rainFactor < 1.0) deductions.push(`Yağış Etkisi: %${Math.round((1 - rainFactor) * 100)} azalma`);
+
+    return { score: finalScore, deductions, temp, windSpeed, precip, message };
 }
 
 function updateHomeUI(analysis, rawData) {
@@ -288,8 +346,22 @@ function updateHomeUI(analysis, rawData) {
 
     // Update score
     scoreNumber.textContent = score;
-    const offset = 100 - score;
-    scoreRing.setAttribute('stroke-dashoffset', offset);
+
+    // Animate Ring (Empty -> Full -> Score)
+    // 1. Reset to empty (100)
+    scoreRing.style.transition = 'none';
+    scoreRing.style.strokeDashoffset = '100';
+    scoreRing.getBoundingClientRect(); // Force reflow
+
+    // 2. Animate to Full (0)
+    scoreRing.style.transition = 'stroke-dashoffset 1s ease-out';
+    scoreRing.style.strokeDashoffset = '0';
+
+    // 3. Animate to Actual Score
+    setTimeout(() => {
+        const offset = 100 - score;
+        scoreRing.style.strokeDashoffset = offset.toString();
+    }, 1000);
 
     // Update color based on score
     if (score >= 85) {
@@ -308,6 +380,12 @@ function updateHomeUI(analysis, rawData) {
     document.getElementById('wind-value').textContent = `${current.wind_speed_10m} km/h`;
     document.getElementById('rain-value').textContent = `${current.precipitation} mm`;
     document.getElementById('feel-value').textContent = `${current.apparent_temperature}°C`;
+
+    // Update score message
+    const msgEl = document.getElementById('score-message');
+    if (msgEl && analysis.message) {
+        msgEl.textContent = analysis.message;
+    }
 }
 
 function showLoading(show) {
@@ -430,24 +508,40 @@ function updateRouteUI(analysis, rawData) {
     const { score } = analysis;
     const current = rawData.current;
 
-    // Update score
-    routeScoreNumber.textContent = score;
-    const offset = 100 - score;
-    routeScoreRing.setAttribute('stroke-dashoffset', offset);
+    // Update Score UI
+    const routeScoreNumber = document.getElementById('route-score-number');
+    const routeScoreRing = document.getElementById('route-score-ring');
+    const routeScoreMessage = document.getElementById('route-score-message');
 
-    // Update color based on score
-    if (score >= 85) {
+    routeScoreNumber.textContent = analysis.score;
+    if (routeScoreMessage) routeScoreMessage.textContent = analysis.message;
+
+    // Update Ring Color
+    if (analysis.score >= 85) {
         routeScoreRing.classList.remove('text-yellow-500', 'text-red-500');
         routeScoreRing.classList.add('text-green-500');
-    } else if (score >= 60) {
+    } else if (analysis.score >= 60) {
         routeScoreRing.classList.remove('text-green-500', 'text-red-500');
         routeScoreRing.classList.add('text-yellow-500');
     } else {
         routeScoreRing.classList.remove('text-green-500', 'text-yellow-500');
         routeScoreRing.classList.add('text-red-500');
     }
+    // Animate Ring (Empty -> Full -> Score)
+    // 1. Reset to empty (100)
+    routeScoreRing.style.transition = 'none';
+    routeScoreRing.style.strokeDashoffset = '100';
+    routeScoreRing.getBoundingClientRect(); // Force reflow
 
-    // Update weather cards
+    // 2. Animate to Full (0)
+    routeScoreRing.style.transition = 'stroke-dashoffset 1s ease-out';
+    routeScoreRing.style.strokeDashoffset = '0';
+
+    // 3. Animate to Actual Score
+    setTimeout(() => {
+        const offset = 100 - analysis.score;
+        routeScoreRing.style.strokeDashoffset = offset.toString();
+    }, 1000);
     document.getElementById('route-temp-value').textContent = `${current.temperature_2m}°C`;
     document.getElementById('route-wind-value').textContent = `${current.wind_speed_10m} km/h`;
     document.getElementById('route-rain-value').textContent = `${current.precipitation} mm`;
@@ -488,11 +582,34 @@ let watchId = null;
 let maxSpeed = 0;
 const MAX_DISPLAY_SPEED = 200; // Maximum speed to display on gauge (km/h)
 
-startGpsBtn?.addEventListener('click', () => {
+let wakeLock = null;
+
+async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
+    }
+}
+
+function releaseWakeLock() {
+    if (wakeLock !== null) {
+        wakeLock.release().then(() => {
+            wakeLock = null;
+        });
+    }
+}
+
+startGpsBtn?.addEventListener('click', async () => {
     if (!navigator.geolocation) {
         alert('GPS desteklenmiyor');
         return;
     }
+
+    // Request Wake Lock
+    await requestWakeLock();
 
     watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -529,6 +646,9 @@ stopGpsBtn?.addEventListener('click', () => {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
     }
+
+    // Release Wake Lock
+    releaseWakeLock();
 
     gpsStatusIndicator.className = 'w-2 h-2 rounded-full bg-gray-500';
     gpsStatusText.textContent = 'GPS durduruldu';

@@ -2,7 +2,7 @@
 
 ## 📊 Project Status
 **Status**: Live / Maintenance
-**Version**: 1.0.0 (PWA Enabled)
+**Version**: 1.13.0 (Enhanced Animations)
 **Last Updated**: 2025-11-21
 
 ## 🎯 Core Objectives
@@ -33,10 +33,27 @@
 
 ## 🧩 Key Features Implementation
 
-### 1. Weather Scoring Algorithm
-- **Wind**: >50km/h (Critical), >30km/h (Warning).
-- **Temp**: <0°C (Critical), <10°C (Warning), >35°C (Warning).
-- **Rain**: Any rain reduces score significantly.
+### 1. UI / UX
+- **Unified Score Design**: 
+  - Home & Route tabs share the same score design (Number inside circle, message below).
+- **Animations**: 
+  - **Intro/Refresh**: Score ring fills to 100% then drops to actual score ("Overshoot" effect).
+  - **Refresh Button**: Spins while loading.
+  - **Rings**: Animated transitions for all gauges.
+- **Localization**: Full Turkish interface.
+- **Icons**: Modern Google/Apple Maps icons.
+- **Dark Mode**: Fully supported.
+
+### 2. Weather Scoring Algorithm (Python Logic)
+- **Base Score (Temp)**: 
+  - Ideal Range: **24°C - 38°C** (Score 100).
+  - Penalty: 4 points per degree outside this range.
+- **Wind Factor**: 
+  - Threshold: 15 km/h.
+  - Penalty: 2% per km/h above 15.
+- **Rain Factor**: 
+  - Penalty: 20% per mm.
+- **Final Score**: Base Score * Wind Factor * Rain Factor.
 
 ### 2. Route Planning
 - Fetches route geometry from OSRM.
@@ -47,6 +64,19 @@
 - **Service Worker**: Caches core assets (`index.html`, `style.css`, `script.js`, fonts, leaflet).
 - **Update Strategy**: `registration.update()` called on load to ensure fresh content.
 - **iOS Prompt**: Detects iOS browser user and shows a custom instruction banner to install the app.
+
+### 4. Dynamic Greeting
+- **Time-based**: Changes greeting text based on time of day (Günaydın, Tünaydın, İyi Akşamlar, İyi Geceler).
+- **Auto-update**: Checks every minute to ensure accuracy.
+
+### 5. GPS Speedometer
+- **Real-time Speed**: Uses Geolocation API to track speed.
+- **Wake Lock**: Prevents screen from sleeping while GPS mode is active (using Screen Wake Lock API).
+
+### 6. Developer Test Mode
+- **Manual Override**: Allows manually setting temperature via slider (-10°C to 50°C).
+- **Real-time Scoring**: Instantly recalculates driving score based on slider value without API calls.
+- **Toggleable UI**: Hidden by default, activated via checkbox.
 
 ## 📂 File Structure
 ```

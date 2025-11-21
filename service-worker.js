@@ -1,4 +1,4 @@
-const CACHE_NAME = 'surusskor-v3';
+const CACHE_NAME = 'surusskor-v19';
 const urlsToCache = [
     './',
     './index.html',
@@ -12,6 +12,8 @@ const urlsToCache = [
 
 // Install Service Worker
 self.addEventListener('install', event => {
+    // Force waiting service worker to become active
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -55,15 +57,19 @@ self.addEventListener('fetch', event => {
 // Update Service Worker
 self.addEventListener('activate', event => {
     const cacheWhitelist = [CACHE_NAME];
+    // Take control of all clients immediately
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
+        Promise.all([
+            self.clients.claim(),
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        if (cacheWhitelist.indexOf(cacheName) === -1) {
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+        ])
     );
 });
