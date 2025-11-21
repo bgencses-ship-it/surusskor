@@ -571,19 +571,6 @@ calculateFuel();
 // PWA Install Prompt Logic
 // Run immediately since script is at end of body
 (function () {
-    // DEBUG BUTTON LOGIC
-    document.getElementById('debug-btn')?.addEventListener('click', () => {
-        const prompt = document.getElementById('ios-install-prompt');
-        alert('Debug Clicked!\nPrompt Element: ' + (prompt ? 'FOUND' : 'MISSING'));
-        if (prompt) {
-            prompt.classList.remove('hidden');
-            prompt.style.display = 'block';
-            prompt.classList.remove('translate-y-full', 'opacity-0');
-            prompt.style.transform = 'translateY(0)';
-            prompt.style.opacity = '1';
-        }
-    });
-
     // DEBUG: Alert to prove script is running
     // alert('Script loaded! Checking install prompt...'); 
 
@@ -591,25 +578,17 @@ calculateFuel();
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     const promptShown = localStorage.getItem('iosInstallPromptShown');
 
-    // DEBUG: Force show for testing (remove 'true ||' and '!promptShown' check later)
-    // Original: if (isIOS && !isStandalone && !promptShown)
-    if (true || (isIOS && !isStandalone && !promptShown)) {
+    if (isIOS && !isStandalone && !promptShown) {
         const prompt = document.getElementById('ios-install-prompt');
         const closeBtn = document.getElementById('close-install-prompt');
 
         if (prompt && closeBtn) {
-            console.log('Showing install prompt...'); // Debug log
             // Show prompt after 2 seconds
             setTimeout(() => {
-                // Force remove hidden and set display block
                 prompt.classList.remove('hidden');
-                prompt.style.display = 'block'; // Fallback
-
                 // Small delay for animation
                 setTimeout(() => {
                     prompt.classList.remove('translate-y-full', 'opacity-0');
-                    prompt.style.transform = 'translateY(0)'; // Fallback
-                    prompt.style.opacity = '1'; // Fallback
                 }, 100);
             }, 2000);
 
