@@ -574,11 +574,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     const promptShown = localStorage.getItem('iosInstallPromptShown');
 
-    if (isIOS && !isStandalone && !promptShown) {
+    // DEBUG: Force show for testing (remove 'true ||' and '!promptShown' check later)
+    // Original: if (isIOS && !isStandalone && !promptShown)
+    if (true || (isIOS && !isStandalone && !promptShown)) {
         const prompt = document.getElementById('ios-install-prompt');
         const closeBtn = document.getElementById('close-install-prompt');
 
         if (prompt && closeBtn) {
+            console.log('Showing install prompt...'); // Debug log
             // Show prompt after 2 seconds
             setTimeout(() => {
                 prompt.classList.remove('hidden');
