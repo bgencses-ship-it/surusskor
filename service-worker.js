@@ -1,4 +1,4 @@
-const CACHE_NAME = 'surusskor-v2';
+const CACHE_NAME = 'surusskor-v3';
 const urlsToCache = [
     './',
     './index.html',
