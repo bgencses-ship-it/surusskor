@@ -569,7 +569,11 @@ fuelDistanceInput?.addEventListener('input', calculateFuel);
 calculateFuel();
 
 // PWA Install Prompt Logic
-document.addEventListener('DOMContentLoaded', () => {
+// Run immediately since script is at end of body
+(function () {
+    // DEBUG: Alert to prove script is running
+    // alert('Script loaded! Checking install prompt...'); 
+
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     const promptShown = localStorage.getItem('iosInstallPromptShown');
